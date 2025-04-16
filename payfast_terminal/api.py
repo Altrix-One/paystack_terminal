@@ -1,9 +1,8 @@
 """
 Author:Hedgar Ajakaiye
 Date: January 02, 2025
-Description: A custom module for integrating Paystack Terminal with ERPNext
+Description: A custom module for integrating Payfast Terminal with ERPNext
 """
-
 
 import frappe
 import requests
@@ -12,13 +11,13 @@ from frappe import _
 
 @frappe.whitelist(allow_guest=True)
 def handle_webhook():
-    """Handle Paystack webhook notifications"""
+    """Handle Payfast webhook notifications"""
     try:
         # Get the signature from headers
         signature = frappe.get_request_header('x-paystack-signature')
         
         if not signature:
-            frappe.logger().warning("No Paystack signature in webhook")
+            frappe.logger().warning("No Payfast signature in webhook")
             return {'status': 'error', 'message': 'No signature'}
             
         # Get request data
@@ -26,7 +25,7 @@ def handle_webhook():
             data = json.loads(frappe.request.data)
             
             # Log webhook data for debugging
-            frappe.logger().debug(f"Paystack Webhook Data: {data}")
+            frappe.logger().debug(f"Payfast Webhook Data: {data}")
             
             # Ensure data is a dictionary
             if not isinstance(data, dict):
@@ -38,13 +37,13 @@ def handle_webhook():
             if event == "charge.success":
                 # Process immediately but don't wait
                 frappe.enqueue(
-                    'paystack_terminal.api.handle_successful_charge',
+                    'payfast_terminal.api.handle_successful_charge',
                     data=data.get('data', {}),  # Ensure this is a dict
                     queue='short'
                 )
             elif event == "paymentrequest.success":
                 frappe.enqueue(
-                    'paystack_terminal.api.handle_successful_payment_request',
+                    'payfast_terminal.api.handle_successful_payment_request',
                     data=data.get('data', {}),
                     queue='short'
                 )
@@ -90,16 +89,16 @@ def handle_successful_payment_request(data):
         frappe.logger().error(f"Payment Request Processing Error: {str(e)}")
 
 def create_payment_entry(reference, amount, invoice=None, metadata=None):
-    """Create a Payment Entry for successful Paystack payments"""
+    """Create a Payment Entry for successful Payfast payments"""
     try:
         # Ensure amount is float
         amount = float(amount) if isinstance(amount, str) else amount
         
         # Ensure Mode of Payment exists
-        if not frappe.db.exists("Mode of Payment", "Paystack Terminal"):
+        if not frappe.db.exists("Mode of Payment", "Payfast Terminal"):
             frappe.get_doc({
                 "doctype": "Mode of Payment",
-                "mode_of_payment": "Paystack Terminal",
+                "mode_of_payment": "Payfast Terminal",
                 "type": "Bank",
                 "enabled": 1
             }).insert(ignore_permissions=True)
@@ -113,7 +112,7 @@ def create_payment_entry(reference, amount, invoice=None, metadata=None):
             "payment_type": "Receive",
             "posting_date": frappe.utils.today(),
             "company": company,
-            "mode_of_payment": "Paystack Terminal",
+            "mode_of_payment": "Payfast Terminal",
             "paid_amount": amount,
             "received_amount": amount,
             "target_exchange_rate": 1,
@@ -138,7 +137,7 @@ def create_payment_entry(reference, amount, invoice=None, metadata=None):
         
         # Set accounts
         payment_entry.paid_to = frappe.get_value("Mode of Payment Account",
-            {"parent": "Paystack Terminal", "company": company}, "default_account")
+            {"parent": "Payfast Terminal", "company": company}, "default_account")
             
         if not payment_entry.paid_to:
             payment_entry.paid_to = frappe.get_value("Company", company, "default_bank_account")
@@ -164,7 +163,7 @@ def create_payment_entry(reference, amount, invoice=None, metadata=None):
 def reconcile_pending_payments():
     """Daily reconciliation of pending payments"""
     try:
-        settings = frappe.get_single("Paystack Settings")
+        settings = frappe.get_single("Payfast Settings")
         
         if not settings.enabled:
             return
@@ -190,8 +189,8 @@ def reconcile_pending_payments():
         
         for invoice in pending_invoices:
             try:
-                # Verify payment status with Paystack
-                verify_url = f"https://api.paystack.co/transaction/verify/{invoice.terminal_reference}"
+                # Verify payment status with Payfast
+                verify_url = f"https://api.payfast.co.za/transaction/verify/{invoice.terminal_reference}"
                 verify_response = requests.get(verify_url, headers=headers)
                 
                 if verify_response.status_code == 200:
@@ -219,8 +218,8 @@ def reconcile_pending_payments():
 def update_payment_status(doc, method):
     """Update payment status in Sales Invoice when Payment Entry is submitted"""
     try:
-        # Only process if it's a Paystack Terminal payment
-        if doc.mode_of_payment != "Paystack Terminal":
+        # Only process if it's a Payfast Terminal payment
+        if doc.mode_of_payment != "Payfast Terminal":
             return
             
         # Get linked Sales Invoice
@@ -229,7 +228,7 @@ def update_payment_status(doc, method):
                 sales_invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
                 
                 # Update custom field
-                sales_invoice.db_set("paystack_status", "Paid")
+                sales_invoice.db_set("payfast_status", "Paid")
                 sales_invoice.db_set("terminal_reference", doc.reference_no)
                 
                 # Add comment to Sales Invoice
@@ -238,7 +237,7 @@ def update_payment_status(doc, method):
                     "comment_type": "Info",
                     "reference_doctype": "Sales Invoice",
                     "reference_name": sales_invoice.name,
-                    "content": f"Payment processed via Paystack Terminal (Reference: {doc.reference_no})"
+                    "content": f"Payment processed via Payfast Terminal (Reference: {doc.reference_no})"
                 }).insert(ignore_permissions=True)
                 
                 frappe.db.commit()
@@ -250,14 +249,14 @@ def update_payment_status(doc, method):
 
 @frappe.whitelist()
 def process_terminal_payment(invoice, amount, customer):
-    """Process payment through Paystack Terminal"""
+    """Process payment through Payfast Terminal"""
     try:
         # Convert amount to float
         amount = float(amount)
         
-        settings = frappe.get_single("Paystack Settings")
+        settings = frappe.get_single("Payfast Settings")
         if not settings.enabled:
-            frappe.throw(_("Paystack Terminal integration is disabled"))
+            frappe.throw(_("Payfast Terminal integration is disabled"))
             
         # Check terminal status before proceeding
         headers = {
@@ -266,7 +265,7 @@ def process_terminal_payment(invoice, amount, customer):
         }
         
         # Check if terminal is online and available
-        terminal_url = f"https://api.paystack.co/terminal/{settings.terminal_id}/presence"
+        terminal_url = f"https://api.payfast.co.za/terminal/{settings.terminal_id}/presence"
         terminal_response = requests.get(terminal_url, headers=headers)
         
         if terminal_response.status_code != 200:
@@ -300,9 +299,9 @@ def process_terminal_payment(invoice, amount, customer):
         # Check if customer exists in Paystack
         paystack_customer_code = customer.get("paystack_customer_code")
         if not paystack_customer_code:
-            # Create new customer in Paystack
+            # Create new customer in Payfast
             customer_response = requests.post(
-                "https://api.paystack.co/customer",
+                "https://api.payfast.co.za/customer",
                 headers=headers,
                 json=customer_data
             )
@@ -317,13 +316,13 @@ def process_terminal_payment(invoice, amount, customer):
                         update_modified=False
                     )
             else:
-                frappe.logger().error(f"Failed to create customer in Paystack: {customer_response.text}")
-                frappe.throw(_("Failed to create customer in Paystack"))
+                frappe.logger().error(f"Failed to create customer in Payfast: {customer_response.text}")
+                frappe.throw(_("Failed to create customer in Payfast"))
         
         # Create payment request
         payment_data = {
             "customer": paystack_customer_code,
-            "amount": str(float(amount) * 100),  # Convert to kobo
+            "amount": str(float(amount) * 100),  # Convert to cents
             "metadata": {
                 "invoice_no": invoice,
                 "customer_name": customer.customer_name,
@@ -334,7 +333,7 @@ def process_terminal_payment(invoice, amount, customer):
             }
         }
         
-        create_request_url = "https://api.paystack.co/paymentrequest"
+        create_request_url = "https://api.payfast.co.za/paymentrequest"
         request_response = requests.post(create_request_url, headers=headers, json=payment_data)
         
         if request_response.status_code != 200:
@@ -352,7 +351,7 @@ def process_terminal_payment(invoice, amount, customer):
             }
         }
         
-        terminal_url = f"https://api.paystack.co/terminal/{settings.terminal_id}/event"
+        terminal_url = f"https://api.payfast.co.za/terminal/{settings.terminal_id}/event"
         terminal_response = requests.post(terminal_url, headers=headers, json=terminal_data)
         
         if terminal_response.status_code != 200:
@@ -361,7 +360,7 @@ def process_terminal_payment(invoice, amount, customer):
         # Store reference in invoice
         frappe.db.set_value("Sales Invoice", invoice, {
             "terminal_reference": request_data["offline_reference"],
-            "paystack_status": "Pending"
+            "payfast_status": "Pending"
         })
         
         return {
@@ -373,3 +372,99 @@ def process_terminal_payment(invoice, amount, customer):
     except Exception as e:
         frappe.logger().error(f"Terminal Payment Error: {str(e)}")
         frappe.throw(_("Failed to process terminal payment"))
+
+
+def create_recurring_invoices():
+    """Create recurring invoices"""
+    today = frappe.utils.today()
+    invoices = frappe.get_all("Sales Invoice", filters={"recurring_payment": 1, "status": "Unpaid"}, fields=["name", "customer", "company", "recurring_interval", "posting_date", "due_date", "currency", "items"])
+
+    for invoice in invoices:
+        try:
+            # Calculate next posting date
+            if invoice.recurring_interval == "Daily":
+                next_posting_date = frappe.utils.add_days(invoice.posting_date, 1)
+            elif invoice.recurring_interval == "Weekly":
+                next_posting_date = frappe.utils.add_days(invoice.posting_date, 7)
+            elif invoice.recurring_interval == "Monthly":
+                next_posting_date = frappe.utils.add_months(invoice.posting_date, 1)
+            elif invoice.recurring_interval == "Yearly":
+                next_posting_date = frappe.utils.add_years(invoice.posting_date, 1)
+            else:
+                continue
+
+            # Skip if next posting date is in the future
+            if next_posting_date > today:
+                continue
+
+            # Create new sales invoice
+            new_invoice = frappe.new_doc("Sales Invoice")
+            new_invoice.customer = invoice.customer
+            new_invoice.company = invoice.company
+            new_invoice.currency = invoice.currency
+            new_invoice.posting_date = next_posting_date
+            new_invoice.due_date = next_posting_date
+
+            # Add items from the original invoice
+            for item in invoice.items:
+                new_invoice.append("items", {
+                    "item_code": item.item_code,
+                    "qty": item.qty,
+                    "rate": item.rate,
+                    "amount": item.amount,
+                    "uom": item.uom,
+                    "warehouse": item.warehouse
+                })
+
+            # Submit the new invoice
+            new_invoice.insert()
+            new_invoice.submit()
+
+            frappe.logger().info(f"Created recurring invoice {new_invoice.name} from {invoice.name}")
+
+        except Exception as e:
+            frappe.logger().error(f"Failed to create recurring invoice from {invoice.name}: {str(e)}")
+
+# Schedule Tasks for reconciliation
+scheduler_events = {
+    "daily": [
+        "payfast_terminal.api.reconcile_pending_payments",
+        "payfast_terminal.api.create_recurring_invoices"
+    ]
+}
+
+def tokenize_card(customer, card_details):
+    """Tokenize credit card details for secure storage"""
+    try:
+        settings = frappe.get_single("Payfast Settings")
+        if not settings.enabled:
+            frappe.throw(_("Payfast Terminal integration is disabled"))
+
+        # Prepare data for tokenization
+        data = {
+            "card_number": card_details.card_number,
+            "expiry_month": card_details.expiry_month,
+            "expiry_year": card_details.expiry_year,
+            "cvv": card_details.cvv
+        }
+
+        # Call Payfast API to tokenize card details
+        headers = {
+            "Authorization": f"Bearer {settings.get_password('secret_key')}",
+            "Content-Type": "application/json"
+        }
+        tokenization_url = "https://api.payfast.co.za/tokenization";
+        response = requests.post(tokenization_url, headers=headers, json=data)
+
+        if response.status_code == 200:
+            token = response.json().get("token")
+            # Store token in Customer doctype
+            frappe.db.set_value("Customer", customer, "payfast_token", token)
+            return token
+        else:
+            frappe.logger().error(f"Failed to tokenize card: {response.text}")
+            frappe.throw(_("Failed to tokenize card"))
+
+    except Exception as e:
+        frappe.logger().error(f"Tokenization Error: {str(e)}")
+        frappe.throw(_("Failed to tokenize card"))

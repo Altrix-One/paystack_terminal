@@ -3,11 +3,11 @@ from frappe import _
 def get_data():
     return [
         {
-            "module_name": "Paystack Terminal",
+            "module_name": "Payfast Terminal",
             "color": "grey",
             "icon": "octicon octicon-credit-card",
             "type": "module",
-            "label": "Paystack Terminal",
+            "label": "Payfast Terminal",
             "category": "Modules"
         }
     ]

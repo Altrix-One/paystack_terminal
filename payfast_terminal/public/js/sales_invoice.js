@@ -1,7 +1,7 @@
 frappe.ui.form.on('Sales Invoice', {
     refresh: function(frm) {
         if(frm.doc.docstatus === 1 && frm.doc.status !== 'Paid') {
-            frm.add_custom_button(__('Process Payment with Paystack Terminal'), function() {
+            frm.add_custom_button(__('Process Payment with Payfast Terminal'), function() {
                 frappe.call({
                     method: 'paystack_terminal.api.process_terminal_payment',
                     args: {
