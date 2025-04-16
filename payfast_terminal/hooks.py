@@ -1,40 +1,40 @@
 """
 Author:Christiaan Swart
 Date: January 02, 2025
-Description: A custom module for integrating Payfast Terminal with ERPNext
+Description: A custom module for integrating  Terminal with ERPNext
 """
 
-app_name = "payfast_terminal"
-app_title = "Payfast Terminal"
+app_name = "_terminal"
+app_title = " Terminal"
 app_publisher = "Gemutanalytics"
-app_description = "Payfast Terminal Integration for ERPNext"
+app_description = " Terminal Integration for ERPNext"
 app_email = "info@cohenix.com"
 app_license = "MIT"
 
 # DocTypes to be registered
-doctype_list = ["Payfast Settings"]
+doctype_list = [" Settings"]
 
 # Module configuration
 modules = {
-    "Payfast Terminal": {
+    " Terminal": {
         "color": "#25c16f",
         "icon": "octicon octicon-credit-card",
         "type": "module",
-        "label": "Payfast Terminal",
+        "label": " Terminal",
         "category": "Modules"
     }
 }
 
 # include js, css files in header of desk.html
 app_include_js = [
-    "/assets/payfast_terminal/js/payfast_terminal.js",
-    "/assets/payfast_terminal/js/customer.js"
+    "/assets/_terminal/js/_terminal.js",
+    "/assets/_terminal/js/customer.js"
 ]
 
 # Doc Events
 doc_events = {
     "Payment Entry": {
-        "on_submit": "payfast_terminal.api.update_payment_status"
+        "on_submit": "_terminal.api.update_payment_status"
     }
 }
 
@@ -45,22 +45,22 @@ fixtures = [
         "filters": [
             ["name", "in", [
                 "Customer-paystack_customer_code",
-                "Payment Entry-payfast_reference",
+                "Payment Entry-_reference",
                 "Sales Invoice-terminal_reference",
-                "Sales Invoice-payfast_status"
+                "Sales Invoice-_status"
             ]]
         ]
     },
     {
         "dt": "DocType",
-        "filters": [["name", "in", ["Payfast Settings"]]]
+        "filters": [["name", "in", [" Settings"]]]
     },
     {
         "dt": "Mode of Payment",
-        "filters": [["name", "=", "Payfast Terminal"]],
+        "filters": [["name", "=", " Terminal"]],
         "records": [{
             "doctype": "Mode of Payment",
-            "mode_of_payment": "Payfast Terminal",
+            "mode_of_payment": " Terminal",
             "type": "Bank",
             "enabled": 1
         }]
@@ -75,8 +75,8 @@ doctype_js = {
 # Webhooks
 webhooks = [
     {
-        "webhook": "Payfast Terminal Webhook",
-        "url": "/api/method/payfast_terminal.api.handle_webhook",
+        "webhook": " Terminal Webhook",
+        "url": "/api/method/_terminal.api.handle_webhook",
         "request_method": "POST"
     }
 ]
@@ -84,7 +84,7 @@ webhooks = [
 # Schedule Tasks for reconciliation
 scheduler_events = {
     "daily": [
-        "payfast_terminal.api.reconcile_pending_payments",
-        "payfast_terminal.api.create_recurring_invoices"
+        "_terminal.api.reconcile_pending_payments",
+        "_terminal.api.create_recurring_invoices"
     ]
 }

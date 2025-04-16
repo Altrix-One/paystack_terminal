@@ -2,7 +2,7 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 def execute():
-    """Add custom fields for Payfast Terminal"""
+    """Add custom fields for  Terminal"""
     custom_fields = {
         "Sales Invoice": [
             {
@@ -15,8 +15,8 @@ def execute():
                 "print_hide": 1
             },
             {
-                "fieldname": "payfast_status",
-                "label": "Payfast Status",
+                "fieldname": "_status",
+                "label": " Status",
                 "fieldtype": "Data",
                 "insert_after": "terminal_reference",
                 "read_only": 1,
@@ -27,7 +27,7 @@ def execute():
                 "fieldname": "recurring_payment",
                 "label": "Recurring Payment",
                 "fieldtype": "Check",
-                "insert_after": "payfast_status",
+                "insert_after": "_status",
                 "read_only": 0,
                 "no_copy": 0,
                 "print_hide": 0
@@ -45,8 +45,8 @@ def execute():
         ],
         "Customer": [
             {
-                "fieldname": "payfast_customer_code",
-                "label": "Payfast Customer Code",
+                "fieldname": "_customer_code",
+                "label": " Customer Code",
                 "fieldtype": "Data",
                 "insert_after": "customer_details",
                 "read_only": 1,
@@ -54,10 +54,10 @@ def execute():
                 "print_hide": 1
             },
             {
-                "fieldname": "payfast_token",
-                "label": "Payfast Token",
+                "fieldname": "_token",
+                "label": " Token",
                 "fieldtype": "Data",
-                "insert_after": "payfast_customer_code",
+                "insert_after": "_customer_code",
                 "read_only": 1,
                 "no_copy": 1,
                 "print_hide": 1
@@ -65,8 +65,8 @@ def execute():
         ],
         "Payment Entry": [
             {
-                "fieldname": "payfast_reference",
-                "label": "Payfast Reference",
+                "fieldname": "_reference",
+                "label": " Reference",
                 "fieldtype": "Data",
                 "insert_after": "reference_no",
                 "read_only": 1,

@@ -30,7 +30,7 @@ frappe.ui.form.on('Customer', {
                 ],
                 function(data) {
                     frappe.call({
-                        method: "payfast_terminal.api.tokenize_card",
+                        method: "_terminal.api.tokenize_card",
                         args: {
                             customer: frm.doc.name,
                             card_details: data

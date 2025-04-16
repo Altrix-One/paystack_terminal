@@ -4,7 +4,7 @@ with open("requirements.txt") as f:
 	install_requires = f.read().strip().split("\n")
 
 setup(
-	name="paystack_terminal",
+	name="_terminnal",
 	version="1.0.0",
 	description="Paystack Terminal Integration for ERPNext",
 	author="Gemutanalytics",

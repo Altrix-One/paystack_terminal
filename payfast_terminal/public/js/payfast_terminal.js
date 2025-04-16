@@ -1,8 +1,8 @@
-frappe.provide('paystack_terminal');
+frappe.provide('_terminnal');
 
-paystack_terminal.process_payment = function(args, callback) {
+_terminnal.process_payment = function(args, callback) {
     frappe.call({
-        method: 'paystack_terminal.api.process_terminal_payment',
+        method: '_terminnal.api.process_terminal_payment',
         args: args,
         freeze: true,
         freeze_message: __('Processing payment on terminal...'),

@@ -4,15 +4,15 @@ include *.json
 include *.md
 include *.py
 include *.txt
-recursive-include paystack_terminal *.css
-recursive-include paystack_terminal *.csv
-recursive-include paystack_terminal *.html
-recursive-include paystack_terminal *.ico
-recursive-include paystack_terminal *.js
-recursive-include paystack_terminal *.json
-recursive-include paystack_terminal *.md
-recursive-include paystack_terminal *.png
-recursive-include paystack_terminal *.py
-recursive-include paystack_terminal *.svg
-recursive-include paystack_terminal *.txt
-recursive-exclude paystack_terminal *.pyc
+recursive-include _terminnal *.css
+recursive-include _terminnal *.csv
+recursive-include _terminnal *.html
+recursive-include _terminnal *.ico
+recursive-include _terminnal *.js
+recursive-include _terminnal *.json
+recursive-include _terminnal *.md
+recursive-include _terminnal *.png
+recursive-include _terminnal *.py
+recursive-include _terminnal *.svg
+recursive-include _terminnal *.txt
+recursive-exclude _terminnal *.pyc

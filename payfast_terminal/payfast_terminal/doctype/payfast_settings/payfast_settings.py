@@ -23,7 +23,7 @@ class PaystackSettings(Document):
             self.check_terminal_status()
             
             # Set webhook URL
-            self.webhook_url = f"{frappe.utils.get_url()}/api/method/paystack_terminal.api.handle_webhook"
+            self.webhook_url = f"{frappe.utils.get_url()}/api/method/_terminnal.api.handle_webhook"
     
     def check_terminal_status(self):
         """Check if terminal is available"""
