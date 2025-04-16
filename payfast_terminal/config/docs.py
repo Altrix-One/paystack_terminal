@@ -11,5 +11,5 @@ def get_context(context):
 	context.app_title = "Payfast Terminal"
 	context.app_publisher = "Gemutanalytics"
 	context.app_description = "Integrate Payfast Terminal with ERPNext"
-	context.app_email = "dev@gemutanalytics.com"
+	context.app_email = "info@cohenix.com"
 	context.app_license = "MIT"

@@ -1,5 +1,5 @@
 """
-Author:Hedgar Ajakaiye
+Author:Christiaan Swart
 Date: January 02, 2025
 Description: A custom module for integrating Payfast Terminal with ERPNext
 """
@@ -7,8 +7,8 @@ Description: A custom module for integrating Payfast Terminal with ERPNext
 app_name = "payfast_terminal"
 app_title = "Payfast Terminal"
 app_publisher = "Gemutanalytics"
-app_description = "Payfast Terminal Integration for ERPNext Healthcare"
-app_email = "dev@gemutanalytics.com"
+app_description = "Payfast Terminal Integration for ERPNext"
+app_email = "info@cohenix.com"
 app_license = "MIT"
 
 # DocTypes to be registered

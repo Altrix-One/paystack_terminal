@@ -8,7 +8,7 @@ setup(
 	version="1.0.0",
 	description="Paystack Terminal Integration for ERPNext",
 	author="Gemutanalytics",
-	author_email="dev@gemutanalytics.com",
+	author_email="info@cohenix.com",
 	packages=find_packages(),
 	zip_safe=False,
 	include_package_data=True,

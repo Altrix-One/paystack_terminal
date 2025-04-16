@@ -1,5 +1,5 @@
 """
-Author:Hedgar Ajakaiye
+Author:Christiaan Swart
 Date: January 02, 2025
 Description: A custom module for integrating Paystack Terminal with ERPNext
 """
